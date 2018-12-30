@@ -1,12 +1,16 @@
 <html>
     <body style="display: flex; flex-direction: column">
         <form id="source">
-            <select class="sourcetype" name="sourcetype">
+            <select class="sourcetype" name="sourcetype" required>
                 <option>Select an input...</option>
                 <option value="file">File</option>
                 <option value="device">Device</option>
             </select>
         </form>
+        <div style="display: flex">
+            <button class="start" style="flex:1" type="button">Start</button>
+            <button class="stop" style="flex:1" type="button">Stop</button>
+        </div>
         <div
             class="rendertarget"
             style="flex: 1; display: flex; width: 100%"
