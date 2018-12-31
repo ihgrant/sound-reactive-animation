@@ -92,13 +92,39 @@ function startLoop() {
     }
     requestAnimationFrame(startLoop);
     let values = _fft.getValue();
+    let binnedValues = binFFTArray(values);
 
     boxes.forEach((box, i) => {
-        if (values[i]) {
-            // console.log(values[i]);
-            box.style.opacity = (values[i] + 100) / 100;
+        if (binnedValues[i]) {
+            box.style.opacity = (binnedValues[i] + 100) / 100;
         }
     });
-    // console.log('values', values);
+}
+
+function binFFTArray(fftArray) {
+    /* reduce an array of 32 values into an array of NUM_IMAGES values, where each value is
+     * the average of the values that were binned into its place,
+     * e.g. [1,2,3,4,5,6] => [1.5,3.5,5.5]
+     * */
+    return fftArray
+        .reduce((rtnArray, el, i) => {
+            if (Math.abs(el) === Infinity) {
+                /* when it's starting out it'll spit out values of Infinity and -Infinity, so we
+                 * just ignore those.
+                 * */
+                return rtnArray;
+            }
+            const bin = Math.round(i / VALUES_PER_IMAGE);
+            if (rtnArray[bin]) {
+                return Object.assign(rtnArray, {
+                    [bin]: rtnArray[bin].concat(el)
+                });
+            }
+            return Object.assign(rtnArray, { [bin]: [el] });
+        }, [])
+        .map(el => {
+            const sum = el.reduce((sum, el) => sum + el, 0);
+            return sum / el.length;
+        });
 }
 //#endregion internals
