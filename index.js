@@ -5,12 +5,18 @@ const sourceType = searchParams.get('sourcetype');
 const deviceId = searchParams.get('deviceid');
 const FFT_SIZE = 32; // must be a power of 2 between 32 and 32768
 const NUM_IMAGES = 8;
-const BINS_PER_IMAGE = FFT_SIZE / NUM_IMAGES;
+const VALUES_PER_IMAGE = FFT_SIZE / NUM_IMAGES;
+const _source = new Tone.UserMedia();
+const _fft = new Tone.FFT(FFT_SIZE);
 
 // DOM stuff
 const startButton = document.querySelector('.start');
 const stopButton = document.querySelector('.stop');
-let renderTarget = document.querySelector('.rendertarget');
+const renderTarget = document.querySelector('.rendertarget');
+const form = document.getElementById('source');
+const sourceTypeInput = form.elements.sourcetype;
+
+// temporary rendering to see if it's working or not.
 const boxes = Array.from({ length: NUM_IMAGES }).map(el => {
     let box = document.createElement('div');
     box.setAttribute(
@@ -22,10 +28,7 @@ const boxes = Array.from({ length: NUM_IMAGES }).map(el => {
     return box;
 });
 
-const form = document.getElementById('source');
-const sourceTypeInput = form.elements.sourcetype;
 sourceTypeInput.value = sourceType;
-
 sourceTypeInput.addEventListener('change', () => {
     form.submit();
 });
@@ -33,10 +36,6 @@ sourceTypeInput.addEventListener('change', () => {
 if (sourceType === 'device') {
     initializeDeviceSelect(document, form).catch(console.error);
 }
-
-// sound stuff
-let _source;
-let _fft;
 
 //#region internals
 function initializeDeviceSelect(_document, _form) {
@@ -73,8 +72,6 @@ function startMedia(e, _deviceId) {
         return;
     }
 
-    _source = new Tone.UserMedia();
-    _fft = new Tone.FFT(FFT_SIZE);
     _source.connect(_fft);
 
     return _source

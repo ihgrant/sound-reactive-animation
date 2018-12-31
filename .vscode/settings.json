@@ -1,4 +1,5 @@
 {
     "editor.formatOnSave": true,
+    "editor.rulers": [100],
     "eslint.packageManager": "yarn"
 }
